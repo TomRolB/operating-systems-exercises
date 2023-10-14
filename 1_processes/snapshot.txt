@@ -1,0 +1,5 @@
+USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root         1  0.0  0.0   4620  3512 pts/0    Ss+  23:38   0:00 /bin/bash
+root         9  0.0  0.0   2884   988 pts/1    Ss   23:38   0:00 /bin/sh
+root        64  0.0  0.0   4356  1432 pts/1    S+   23:47   0:00 /bin/bash ./state.sh
+root        65  0.0  0.0   7056  1552 pts/1    R+   23:47   0:00 ps aux

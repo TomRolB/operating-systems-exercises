@@ -1,0 +1,8 @@
+sleep
+sort
+/bin/sh
+/bin/bash
+/bin/bash
+/bin/bash
+ps
+COMMAND
