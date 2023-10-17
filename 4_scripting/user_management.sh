@@ -1,4 +1,6 @@
 #!/bin/bash
+
+#TODO: csv file
 if [ $# -lt 2 ]; then
     echo "Invalid arguments"
     exit 1
@@ -15,8 +17,16 @@ if [ "$1" == "--add-user" ]; then
 fi
 
 if [ "$1" = "--user" ]; then
+    username=$3
+
+    #Check whether the user exists
+    if ! id "$1" >/dev/null 2>&1; then
+        echo "User $username not found"
+        exit 1
+    fi
+
     if [ "$2" =  "--delete-user" ]; then
-        if [ -z "$3" ]; then
+        if [ -z "$username" ]; then
             echo "Expected username, but got no argument instead"
             exit 1
         fi
@@ -26,16 +36,14 @@ if [ "$1" = "--user" ]; then
             exit 1
         fi
 
-        if [ "$3" = -* ]; then
+        if [[ $username = -* ]]; then
             echo "Expected username, but got an option or an argument with a dash instead: $3"
             exit 1
         fi
 
-        sudo deluser --remove-home "$3"
+        sudo deluser --remove-home "$username"
         exit 0
     fi
-
-
 
     # Iterate over the arguments and save them to variables.
     # This is done to avoid starting execution and only afterwards
@@ -46,7 +54,7 @@ if [ "$1" = "--user" ]; then
     groupnamesToRemove=()
 
     i=2
-    while [ i -le $# ]; do
+    while [ $i -le $# ]; do
         case "${!i}" in
 
         --delete-user)
@@ -63,12 +71,12 @@ if [ "$1" = "--user" ]; then
                 exit 1
             fi
 
-            if [ "$groupname" = -* ]; then
+            if [[ $groupname = -* ]]; then
                 echo "Expected groupname, but got an option or an argument with a dash instead: $3"
                 exit 1
             fi
 
-            groupnamesToAdd+="$groupname"
+            groupnamesToAdd+=("$groupname")
         ;;
 
         --remove-from-group)
@@ -80,12 +88,12 @@ if [ "$1" = "--user" ]; then
                 exit 1
             fi
 
-            if [ "$groupname" = -* ]; then
+            if [[ $groupname = -* ]]; then
                 echo "Expected groupname, but got an option or an argument with a dash instead: $3"
                 exit 1
             fi
 
-            groupnamesToRemove+="$groupname"
+            groupnamesToRemove+=("$groupname")
         ;;
 
         --change-password)
@@ -101,17 +109,35 @@ if [ "$1" = "--user" ]; then
         ((i++))
     done
 
+    for groupname in $(groupnamesToRemove)
+    do
+        if [ -z "$(getent group "$groupname")" ]; then
+            echo "Cannot delete from $groupname: group does not exist"
+            exit 1
+        fi
+    done
+
+
     # Begin command execution per se
 
+    # Add user to groups
+    for groupname in $(groupnamesToAdd)
+    do
+        if [ -z "$(getent group $groupname)" ]; then
+            sudo addgroup $groupname
+        fi
 
+        sudo adduser $username $groupname
+    done
 
+    # Change password, if requested
+    if [ $changingPassword ]; then
+        read -ps "Enter your pasword: " | sudo passwd $username
+    fi
 
-
-
-
-
-
-        
-
-
-    
+    # Delete user from groups
+    for groupname in $(groupnamesToRemove)
+    do
+        sudo deluser "$username" "$groupname"
+    done
+fi
