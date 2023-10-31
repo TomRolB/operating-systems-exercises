@@ -1,6 +1,10 @@
 #!/bin/bash
 #TODO: check for permissions
 
+# check_alt_txt() {
+#     if 
+# }
+
 if [ $# -lt 1 ]; then
     echo "You must pass at least one argument. Type './req.sh help' to see the available commands."
     exit 1
@@ -57,12 +61,37 @@ case "$1" in
             fi
         done < "$txt_path"
     ;;
+    add)
+        if [ -z "$2" ]; then
+            echo "Please specify a dependency to add"
+            exit 1
+        fi 
+
+        if [ ! -z grep -w "$2" $txt_path >/dev/null 2>&1 ]; then
+            echo "Dependency $2 was already present in $txt_path"
+            exit 0
+        fi
+
+        # If, in the end, the dependency was not present, add it
+        "$2" >> "$txt_path"
+    ;;
+    remove)
+        if [ -z "$2" ]; then
+            echo "Please specify a dependency to add"
+            exit 1
+        fi 
+
+        if [ ! grep -w "$2" $txt_path >/dev/null 2>&1 ]; then
+            echo "Dependency $2 was not present in $txt_path"
+            exit 0
+        fi
+
+        # If, in the end, the dependency was present, remove it
+        sed "/$2/d"
+    ;;
     *)
         echo "'$1' is not a valid option."
         exit 1
     ;;
+
 esac
-            
-
-
-        

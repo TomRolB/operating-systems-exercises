@@ -1,3 +1,0 @@
-a-non-existing-package
-git
-another-non-existing-package
