@@ -1,4 +1,9 @@
 #!/bin/bash
+# This implementation only executes the command if there's nothing
+# invalid in the arguments. It does not execute all valid arguments
+# and then "explode" if facing that invalidity.
+
+# Must check for permissions
 
 #TODO: csv file
 if [ $# -lt 2 ]; then
