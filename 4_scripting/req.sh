@@ -6,7 +6,7 @@ if [ $# -lt 1 ]; then
     exit 1
 fi
 
-# Place holder txt file name
+# Placeholder txt file name
 txt_path="requirements.txt"
 
 # If a specific txt file name was provided, save it
@@ -28,18 +28,32 @@ case "$1" in
             echo "Could not find txt file in the current directory. Type './req.sh help' to see this command's usage."
             exit 1
         fi
-        echo "$txt_path"
-        while read -r line; do
-            echo "$line"
-            if ! dpkg -s "$line";
+        echo "Analyzing dependencies in '$txt_path'"
+        while read -r line || [ -n "$line" ]; do
+            echo "Processing '$line'"
+            if ! dpkg -s "$line" >/dev/null 2>&1;
             then
-                if apt-cache policy "$line"; then
-                    apt install "$line"
+                if apt install "$line"; then
+                    echo "Installed package $line"
                 else
                     echo "WARNING: skipped package $line because it was not found."
                 fi
             else
-                echo "Package $line was already installed."
+                echo "Package '$line' was already installed."
+            fi
+        done < "$txt_path"
+    ;;
+    verify)
+        if [ -d "$txt_path" ]; then
+            echo "Could not find txt file in the current directory. Type './req.sh help' to see this command's usage."
+            exit 1
+        fi
+
+        echo "Missing dependencies:"
+
+        while read -r line || [ -n "$line" ]; do
+            if ! dpkg -s "$line" >/dev/null 2>&1; then
+                echo "$line"
             fi
         done < "$txt_path"
     ;;
