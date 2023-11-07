@@ -67,13 +67,16 @@ case "$1" in
             exit 1
         fi 
 
-        if [ ! -z grep -w "$2" $txt_path >/dev/null 2>&1 ]; then
+        if grep -w "$2" "$txt_path" >/dev/null 2>&1 ; then
             echo "Dependency $2 was already present in $txt_path"
             exit 0
         fi
 
         # If, in the end, the dependency was not present, add it
-        "$2" >> "$txt_path"
+        echo -e "$2" >> "$txt_path"
+
+        echo "Added $2 to $txt_path"
+        exit 0
     ;;
     remove)
         if [ -z "$2" ]; then
@@ -81,17 +84,18 @@ case "$1" in
             exit 1
         fi 
 
-        if [ ! grep -w "$2" $txt_path >/dev/null 2>&1 ]; then
+        if ! grep -w "$2" "$txt_path" >/dev/null 2>&1 ; then
             echo "Dependency $2 was not present in $txt_path"
             exit 0
         fi
 
         # If, in the end, the dependency was present, remove it
-        sed "/$2/d"
+        sed -i "/$2/d" "$txt_path"
+        echo "Removed $2 from $txt_path"
+        exit 0
     ;;
     *)
         echo "'$1' is not a valid option."
         exit 1
     ;;
-
 esac
