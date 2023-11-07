@@ -94,6 +94,14 @@ case "$1" in
         echo "Removed $2 from $txt_path"
         exit 0
     ;;
+    help)
+        echo "./req.sh install : Installs missing dependencies found at requirements.txt"
+        echo "./req.sh verify : Prints dependencies found at requirements.txt which are not installed"
+        echo "./req.sh add <dependency> # it should add a dependency to the requirements.txt and install it"
+        ./req.sh remove <dependency> # it should remove the dependency from the requirements.txt file
+        ./req.sh install --file ./req.txt # it should be able to override the dependency file on every command
+        ./req.sh install -f  ./req.txt # it should be able to override the dependency file on every command
+    ;;
     *)
         echo "'$1' is not a valid option."
         exit 1
