@@ -15,7 +15,35 @@ create_fs () {
         return 1
     fi
 
-    mke2fs -t ext4
+    size=$2
+
+    # Create file with a given size
+    dd if=/dev/zero of=./$1 bs=1M count=${size:0:-1}
+    # Create filesystem within it
+    mkfs.ext4 ./$1
+}
+
+mount_fs () {
+    check_permissions
+
+    if [ -z "$1" ] || [ -z "$2" ]; then
+        echo "Usage: mount <.img file> <path of mount point>"
+        return 1
+    fi
+
+    mkdir $2
+    mount -o loop $1 $2
+}
+
+mount_fs () {
+    check_permissions
+
+    if [ -z "$1" ]; then
+        echo "Usage: unmount <path of mount point>"
+        return 1
+    fi
+
+    umount $1
 }
 
 while [[ $# -gt 0 ]]; do
@@ -26,3 +54,16 @@ while [[ $# -gt 0 ]]; do
             shift
             shift
         ;;
+        mount)
+            shift
+            mount_fs $1 $2
+            shift
+            shift
+        ;;
+        unmount)
+            shift
+            unmount_fs $1
+            shift
+        ;;
+        format)
+            shift
