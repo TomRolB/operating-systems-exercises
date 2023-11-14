@@ -67,3 +67,10 @@ while [[ $# -gt 0 ]]; do
         ;;
         format)
             shift
+            filename=$1
+            create_fs $1 100M # Default size
+            mount_fs $1 /mnt/${filename:0:-1}]
+            shift
+        ;;
+    esac
+done
