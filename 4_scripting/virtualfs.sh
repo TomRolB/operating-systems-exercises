@@ -19,7 +19,18 @@ create_fs () {
 
     # Create file with a given size
     dd if=/dev/zero of=./$1 bs=1M count=${size:0:-1}
-    # Create filesystem within it
+    
+}
+
+format_fs () {
+    check_permissions
+
+    if [ -z "$1" ]; then
+        echo "Usage: format <.img file>"
+        return 1
+    fi
+
+    # Format file with ext4
     mkfs.ext4 ./$1
 }
 
@@ -54,6 +65,11 @@ while [[ $# -gt 0 ]]; do
             shift
             shift
         ;;
+        format)
+            shift
+            mount_fs $1
+            shift
+        ;;
         mount)
             shift
             mount_fs $1 $2
@@ -65,12 +81,9 @@ while [[ $# -gt 0 ]]; do
             unmount_fs $1
             shift
         ;;
-        format)
-            shift
-            filename=$1
-            create_fs $1 100M # Default size
-            mount_fs $1 /mnt/${filename:0:-1}]
-            shift
+        *)
+        echo "Invalid argument"
+        exit 1
         ;;
     esac
 done
