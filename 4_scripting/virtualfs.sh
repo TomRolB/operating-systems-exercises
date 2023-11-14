@@ -30,6 +30,10 @@ format_fs () {
         return 1
     fi
 
+    if [ -f "$1" ]; then
+        echo "Could not format $1: file does not exist."
+    fi
+
     # Format file with ext4
     mkfs.ext4 ./$1
 }
