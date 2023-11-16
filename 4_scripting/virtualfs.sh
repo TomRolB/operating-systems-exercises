@@ -7,6 +7,12 @@ check_permissions () {
     fi
 }
 
+check_file_exists () {
+    if [ -f "$1" ]; then
+        echo "Could not format $1: file does not exist."
+    fi
+}
+
 create_fs () {
     check_permissions
 
@@ -30,9 +36,7 @@ format_fs () {
         return 1
     fi
 
-    if [ -f "$1" ]; then
-        echo "Could not format $1: file does not exist."
-    fi
+    check_file_exists "$1"
 
     # Format file with ext4
     mkfs.ext4 ./$1
@@ -40,6 +44,8 @@ format_fs () {
 
 mount_fs () {
     check_permissions
+
+    check_file_exists "$1"
 
     if [ -z "$1" ] || [ -z "$2" ]; then
         echo "Usage: mount <.img file> <path of mount point>"
@@ -65,18 +71,18 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         create)
             shift
-            create_fs $1 $2
+            create_fs "$1" "$2"
             shift
             shift
         ;;
         format)
             shift
-            mount_fs $1
+            mount_fs "$1"
             shift
         ;;
         mount)
             shift
-            mount_fs $1 $2
+            mount_fs "$1" "$2"
             shift
             shift
         ;;
