@@ -27,8 +27,7 @@ fi
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        grant-)
-            
+        grant-) 
             aux=$1
 
             if [ ${aux:6:} != "read" ]; then
@@ -43,4 +42,29 @@ while [[ $# -gt 0 ]]; do
             args=$@
             modify_access "+" "$permission" $args
         ;;
+        revoke-)
+            aux=$1
 
+            if [ ${aux:6:} != "read" ]; then
+                permission="r"
+            elif [ ${aux:6:} != "write" ]; then
+                permission="w"
+            else
+                echo "Expected 'read' or 'write' permission; got '${aux:6:7}'"
+            fi
+            
+            shift
+            args=$@
+            modify_access "-" "$permission" $args
+        ;;
+        list-permissions)
+            shift
+            if [ ! -d "$1" ] || [ ! -f "$1" ]; then
+                echo "Expected an existing file or directory path; got '$path'"
+            fi
+        ;;
+        *)
+            echo "Invalid argument. Usage:"
+        ;;
+    esac
+done
